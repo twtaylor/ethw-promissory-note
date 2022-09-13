@@ -12,7 +12,7 @@ contract wETHPow is ERC20 {
     address owner;
     address public immutable WETH;
 
-    mapping(address => uint256) originalOwnerNotes;
+    mapping(address => uint256) public originalOwnerNotes;
 
     event Mint(address indexed sender, uint256 amount);
 
@@ -30,22 +30,22 @@ contract wETHPow is ERC20 {
     }
 
     modifier isEthereumMainnetPreFork() {
-        assert(block.chainid == 1 && 2**64 >= block.difficulty);
+        require(block.chainid == 1 && 2**64 >= block.difficulty, "NOT_ETH_PREFORK");
         _;
     }
 
     modifier isEthereumMainnetPostFork() {
-        assert(block.chainid == 1);
+        require(block.chainid == 1, "NOT_MAINCHAIN");
 
         // set as a fail-safe for October 15th, let any owner burn at that point
         if (1665840433 >= block.timestamp) {
-            assert(block.difficulty > 2**64);
+            require(block.difficulty > 2**64, "PRE_MERGE");
         }
         _;
     }
 
     modifier isEthereumWPostFork() {
-        assert(block.chainid == 10001);
+        require(block.chainid == 10001, "NOT_FORK_CHAIN");
         _;
     }
 
@@ -78,39 +78,21 @@ contract wETHPow is ERC20 {
         assert(IWETH(WETH).transfer(to, amount));
     }
 
-    // post-fork chainid = 1001 burn
+    // post-fork chainid = 10001 burn
     function burnPostForkOnEthW(address to, uint256 amount) public isEthereumWPostFork() {
         _burn(msg.sender, amount);
 
         assert(IWETH(WETH).transfer(to, amount));
     }
 
+    // pre-fork chainid = 1 burn
     function burnPreForkOnEth(address to, uint256 amount) public isEthereumMainnetPreFork() {
-        assert(transferFrom(msg.sender, address(this), amount));
         require(originalOwnerNotes[msg.sender] >= amount, "NO_NOTE");
 
-        _burn(address(this), amount);
+        _burn(msg.sender, amount);
 
         originalOwnerNotes[msg.sender] -= amount;
 
         assert(IWETH(WETH).transfer(to, amount));
-    }
-
-    // solely used to recover errant ERC20 transfers
-    function recoverERC20(address erc20contract, address to, uint256 amount) public {
-        assert(msg.sender == owner);
-
-        // do not allow recovery of WETH or this token
-        assert(address(this) != erc20contract && erc20contract != WETH);
-
-        IERC20(erc20contract).transfer(to, amount);
-    }
-
-    // ETH should never be sent to this contract
-    function recoverETH(address to, uint256 amount) public {
-        assert(msg.sender == owner);
-
-        (bool sent, ) = to.call{value: amount}("");
-        require(sent, "FAIL_ETH_SEND");
     }
 }
