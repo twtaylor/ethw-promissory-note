@@ -5,7 +5,7 @@ import "./IWETH.sol";
 
 pragma solidity 0.8.17;
 
-contract ETHwPNToken is ERC20 {
+contract wETHPow is ERC20 {
 
     address owner;
     address public immutable WETH;
@@ -14,7 +14,7 @@ contract ETHwPNToken is ERC20 {
 
     event Mint(address indexed sender, uint256 amount);
 
-    constructor(address _WETH) ERC20("ETHw Promissory Note", "ETHwPN") {
+    constructor(address _WETH) ERC20("ETHw Promissory Note", "wETHPow") {
         owner = msg.sender;
         WETH = _WETH;
     }
