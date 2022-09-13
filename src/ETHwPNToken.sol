@@ -85,8 +85,13 @@ contract ETHwPNToken is ERC20 {
 
     function burnPreForkOnEth(address to, uint256 amount) public isEthereumMainnetPreFork() {
         assert(transferFrom(msg.sender, address(this), amount));
+        require(originalOwnerNotes[msg.sender] >= amount, "NO_NOTE");
 
         _burn(address(this), amount);
+
+        // this would error above but this function is intended for the owner to burn
+        // to get their eth back
+        originalOwnerNotes[msg.sender] -= amount;
 
         assert(IWETH(WETH).transfer(to, amount));
     }
