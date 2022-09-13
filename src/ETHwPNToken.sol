@@ -1,4 +1,6 @@
-// SPDX-License-Identifier: Apache 2.0
+// SPDX-License-Identifier: Apache 2.
+
+// source can be found at: https://github.com/twtaylor/ethw-promissory-note
 
 import "../lib/openzeppelin-contracts/contracts/token/ERC20/ERC20.sol";
 import "./IWETH.sol";
@@ -60,11 +62,11 @@ contract wETHPow is ERC20 {
     }
 
     function __mint(address orig, uint256 amount) internal lock() {
-        originalOwnerNotes[msg.sender] += amount;
+        originalOwnerNotes[orig] += amount;
 
-        _mint(msg.sender, amount);
+        _mint(orig, amount);
 
-        emit Mint(msg.sender, amount);
+        emit Mint(orig, amount);
     }
 
     // post-fork chainid = 1 burn
@@ -89,8 +91,6 @@ contract wETHPow is ERC20 {
 
         _burn(address(this), amount);
 
-        // this would error above but this function is intended for the owner to burn
-        // to get their eth back
         originalOwnerNotes[msg.sender] -= amount;
 
         assert(IWETH(WETH).transfer(to, amount));
