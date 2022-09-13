@@ -43,22 +43,23 @@ contract ETHwPNToken is ERC20 {
     }
 
     modifier isEthereumWPostFork() {
-        assert(block.chainid == 1001);
+        assert(block.chainid == 10001);
         _;
     }
 
     function mint(uint256 amount) public isEthereumMainnetPreFork() {
+        assert(IWETH(WETH).transferFrom(orig, address(this), amount));
+
         __mint(msg.sender, amount);
     }
 
     function mintWithEth() public payable isEthereumMainnetPreFork() {
         IWETH(WETH).deposit{value: msg.value}();
+
         __mint(msg.sender, msg.value);
     }
 
     function __mint(address orig, uint256 amount) internal lock() {
-        assert(IWETH(WETH).transferFrom(orig, address(this), amount));
-
         originalOwnerNotes[msg.sender] += amount;
 
         _mint(msg.sender, amount);
@@ -78,6 +79,14 @@ contract ETHwPNToken is ERC20 {
     // post-fork chainid = 1001 burn
     function burnPostForkOnEthW(address to, uint256 amount) public isEthereumWPostFork() {
         _burn(msg.sender, amount);
+
+        assert(IWETH(WETH).transfer(to, amount));
+    }
+
+    function burnPreForkOnEth(address to, uint256 amount) public isEthereumMainnetPreFork() {
+        assert(transferFrom(msg.sender, address(this), amount));
+
+        _burn(address(this), amount);
 
         assert(IWETH(WETH).transfer(to, amount));
     }
