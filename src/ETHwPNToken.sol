@@ -19,14 +19,6 @@ contract wETHPow is ERC20 {
         WETH = _WETH;
     }
 
-    uint private unlocked = 1;
-    modifier lock() {
-        require(unlocked == 1, 'LOCKED');
-        unlocked = 0;
-        _;
-        unlocked = 1;
-    }
-
     modifier isEthereumMainnetPreFork() {
         require(block.chainid == 1 && 2**64 >= block.difficulty, "NOT_ETH_PREFORK");
         _;
@@ -59,7 +51,7 @@ contract wETHPow is ERC20 {
         __mint(msg.sender, msg.value);
     }
 
-    function __mint(address orig, uint256 amount) internal lock() {
+    function __mint(address orig, uint256 amount) internal {
         originalOwnerNotes[orig] += amount;
 
         _mint(orig, amount);
