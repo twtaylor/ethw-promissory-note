@@ -9,7 +9,6 @@ pragma solidity 0.8.17;
 
 contract wETHPow is ERC20 {
 
-    address owner;
     address public immutable WETH;
 
     mapping(address => uint256) public originalOwnerNotes;
@@ -17,7 +16,6 @@ contract wETHPow is ERC20 {
     event Mint(address indexed sender, uint256 amount);
 
     constructor(address _WETH) ERC20("ETHw Promissory Note", "wETHPow") {
-        owner = msg.sender;
         WETH = _WETH;
     }
 
