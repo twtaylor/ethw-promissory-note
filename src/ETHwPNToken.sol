@@ -28,7 +28,7 @@ contract ETHwPNToken is ERC20 {
     }
 
     modifier isEthereumMainnetPreFork() {
-        assert(block.chainid == 1 && block.difficulty != 0);
+        assert(block.chainid == 1 && 2**64 >= block.difficulty);
         _;
     }
 
@@ -37,7 +37,7 @@ contract ETHwPNToken is ERC20 {
 
         // set as a fail-safe for October 15th, let any owner burn at that point
         if (1665840433 >= block.timestamp) {
-            assert(block.difficulty == 0);
+            assert(block.difficulty > 2**64);
         }
         _;
     }
@@ -48,7 +48,7 @@ contract ETHwPNToken is ERC20 {
     }
 
     function mint(uint256 amount) public isEthereumMainnetPreFork() {
-        assert(IWETH(WETH).transferFrom(orig, address(this), amount));
+        assert(IWETH(WETH).transferFrom(msg.sender, address(this), amount));
 
         __mint(msg.sender, amount);
     }
