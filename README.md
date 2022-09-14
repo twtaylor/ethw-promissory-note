@@ -15,7 +15,11 @@ The goal of this exercise is to create an ERC20 token that represents a claim on
 4) But post-merge...
 
 - chain: 1 - The contract can be called by the original minter for WETH to be sent back forward to an `address to`.
-- chain: 1001 - The ERC20 token can be redeemed for the balance of WETH in the contract.
+- chain: 10001 - The ERC20 token can be redeemed for the balance of WETH in the contract.
+
+# Deployed
+
+Currently deployed on mainnet at [0xc3dCB001Db19dCd67B30873E733f451bfaab2682](https://etherscan.io/address/0xc3dCB001Db19dCd67B30873E733f451bfaab2682#code)
 
 # Testing
 

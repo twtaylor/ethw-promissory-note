@@ -54,7 +54,7 @@ contract CounterTest is Test {
     }
 
     function testFailEthMintEthwChain() public {
-        vm.chainId(1001);
+        vm.chainId(10001);
         vm.difficulty(129382183);
 
         vm.expectRevert();
